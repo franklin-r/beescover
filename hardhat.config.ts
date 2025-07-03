@@ -1,4 +1,5 @@
 import { HardhatUserConfig } from "hardhat/config";
+import 'hardhat-gas-reporter';
 import "@nomicfoundation/hardhat-toolbox";
 
 const config: HardhatUserConfig = {
@@ -10,7 +11,11 @@ const config: HardhatUserConfig = {
 				runs: 200
 			}
 		}
-	}
+	},
+	gasReporter: {
+    enabled: true,
+    token: 'ETH'
+  },
 };
 
 export default config;
