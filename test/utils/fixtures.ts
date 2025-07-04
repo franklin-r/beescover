@@ -7,7 +7,8 @@ import {
 	MockUSDC,
 	Whitelists,
 	Fund,
-	LPToken
+	LPToken,
+	CoverageProof
 } from "../../typechain-types";
 
 // ============================ BEES_COVER_TOKEN ============================ //
@@ -103,4 +104,27 @@ export async function deployLPTokenFixture(): Promise<{
 	const LPTokenFactory = await ethers.getContractFactory("LPToken");
 	const lpToken = await LPTokenFactory.deploy("LPToken", "LPT") as LPToken;
 	return {lpToken};
+}
+
+// ============================= COVERAGE_PROOF ============================= //
+
+export async function deployCoverageProofFixture(): Promise<{
+	coverageProof: CoverageProof;
+	admin: SignerWithAddress;
+}> {
+	const [admin] = await ethers.getSigners();
+	const CoverageProofFactory = await ethers.getContractFactory("CoverageProof");
+	const coverageProof = await CoverageProofFactory.connect(admin).deploy() as CoverageProof;
+	return {coverageProof, admin};
+}
+
+export async function mintNFTFixture(): Promise<{
+	coverageProof: CoverageProof;
+	admin: SignerWithAddress;
+	recipient: SignerWithAddress;
+}> {
+	const [, recipient] = await ethers.getSigners();
+	const {coverageProof, admin} = await loadFixture(deployCoverageProofFixture);
+	await coverageProof.connect(admin).safeMint(recipient.address, 100n, 1000000n, 1n);
+	return {coverageProof, admin, recipient};
 }
