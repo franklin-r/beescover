@@ -2,7 +2,13 @@ import { ethers } from "hardhat";
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { FundType } from "./enums";
-import { BeesCoverToken, MockUSDC, Whitelists, Fund } from "../../typechain-types";
+import {
+	BeesCoverToken,
+	MockUSDC,
+	Whitelists,
+	Fund,
+	LPToken
+} from "../../typechain-types";
 
 // ============================ BEES_COVER_TOKEN ============================ //
 
@@ -87,4 +93,14 @@ export async function deployFundFixture(): Promise<{
 	const FundFactory = await ethers.getContractFactory("Fund");
 	const fund = await FundFactory.connect(fundAdmin).deploy(FundType.Reserve, whitelists.getAddress()) as Fund;
 	return {fund, fundAdmin, assets, reserveTargets, mockUSDC, whitelists};
+}
+
+// ================================ LP_TOKEN ================================ //
+
+export async function deployLPTokenFixture(): Promise<{
+	lpToken: LPToken;
+}> {
+	const LPTokenFactory = await ethers.getContractFactory("LPToken");
+	const lpToken = await LPTokenFactory.deploy("LPToken", "LPT") as LPToken;
+	return {lpToken};
 }
