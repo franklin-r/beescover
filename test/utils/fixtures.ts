@@ -8,7 +8,9 @@ import {
 	Whitelists,
 	Fund,
 	LPToken,
-	CoverageProof
+	CoverageProof,
+	TimelockController,
+	BeesCoverGovernor
 } from "../../typechain-types";
 
 // ============================ BEES_COVER_TOKEN ============================ //
@@ -127,4 +129,59 @@ export async function mintNFTFixture(): Promise<{
 	const {coverageProof, admin} = await loadFixture(deployCoverageProofFixture);
 	await coverageProof.connect(admin).safeMint(recipient.address, 100n, 1000000n, 1n);
 	return {coverageProof, admin, recipient};
+}
+
+// ========================== TIMELOCK_CONTROLLER =========================== //
+
+export async function deployTimelockControllerFixture():  Promise<{
+	timelockController: TimelockController;
+	timelockControllerAdmin: SignerWithAddress;
+}> {
+	const minDelay = BigInt(60 * 60 * 24 * 7);	// 1 week
+	const proposers: string[] = [];
+	const executors: string[] = ["0x0000000000000000000000000000000000000000"];
+	const [timelockControllerAdmin] = await ethers.getSigners();
+	const TimelockControllerFactory = await ethers.getContractFactory("TimelockController");
+	const timelockController = await TimelockControllerFactory.deploy(minDelay, proposers, executors, timelockControllerAdmin) as TimelockController;
+	return {timelockController, timelockControllerAdmin};
+}
+
+// ========================== BEES_COVER_GOVERNOR =========================== //
+
+export async function deployContractFixture(): Promise<{
+	beesCoverGovernor: BeesCoverGovernor;
+	mockUSDC: MockUSDC;
+	timelockController: TimelockController;
+	beesCoverToken: BeesCoverToken;
+}> {
+	const MockUSDCFactory = await ethers.getContractFactory("MockUSDC");
+	const mockUSDC = await MockUSDCFactory.deploy() as MockUSDC;
+	const [minter] = await ethers.getSigners();
+	const BeesCoverTokenFactory = await ethers.getContractFactory("BeesCoverToken");
+	const beesCoverToken = await BeesCoverTokenFactory.deploy(minter.address) as BeesCoverToken;
+	const {timelockController} = await loadFixture(deployTimelockControllerFixture);
+	const BeesCoverGovernorFactory = await ethers.getContractFactory("BeesCoverGovernor");
+	const beesCoverGovernor = await BeesCoverGovernorFactory.deploy(beesCoverToken.getAddress(), timelockController.getAddress()) as BeesCoverGovernor;
+	return {beesCoverGovernor, mockUSDC, timelockController, beesCoverToken};
+}
+
+export async function governorSetUpFixture(): Promise<{
+	beesCoverGovernor: BeesCoverGovernor;
+	admin: SignerWithAddress;
+	mockUSDC: MockUSDC;
+	timelockController: TimelockController;
+	beesCoverToken: BeesCoverToken;
+}> {
+	const [admin] = await ethers.getSigners();
+	const {beesCoverGovernor, mockUSDC, timelockController, beesCoverToken} = await loadFixture(deployContractFixture);
+
+	// Set up roles
+	await timelockController.grantRole(await timelockController.PROPOSER_ROLE(), beesCoverGovernor.getAddress());
+	await timelockController.grantRole(await timelockController.EXECUTOR_ROLE(), "0x0000000000000000000000000000000000000000");
+	await timelockController.renounceRole(await timelockController.DEFAULT_ADMIN_ROLE(), admin.address);
+
+	// Set up delegate
+	await beesCoverToken.delegate(admin.address);
+
+	return {beesCoverGovernor, admin, mockUSDC, timelockController, beesCoverToken};
 }
