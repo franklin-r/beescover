@@ -17,4 +17,12 @@ library Types {
 		/// @notice Represents a whitelisted pool we can interact with for supply
 		Pool
 	}
+
+	/// @notice Represents the types of fund used in the protocol
+	enum FundType {
+		/// @notice Represents a reserve fund (for insurance pools)
+		Reserve,
+		/// @notice Represents a treasury fund (for fees collection)
+		Treasury
+	}
 }

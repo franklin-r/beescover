@@ -1,7 +1,8 @@
 import { ethers } from "hardhat";
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
-import { BeesCoverToken, MockUSDC, Whitelists } from "../../typechain-types";
+import { FundType } from "./enums";
+import { BeesCoverToken, MockUSDC, Whitelists, Fund } from "../../typechain-types";
 
 // ============================ BEES_COVER_TOKEN ============================ //
 
@@ -52,4 +53,38 @@ export async function whitelistsAddFixture(): Promise<{
 	const {whitelists, admin} = await loadFixture(deployWhitelistsFixture);
 	await whitelists.connect(admin).add(assets, reserveTargets, treasuryTargets);
 	return {whitelists, admin, assets, reserveTargets, treasuryTargets};
+}
+
+// ================================== FUND ================================== //
+
+async function setUpFundDeploymentFixture(): Promise<{
+	mockUSDC: MockUSDC;
+	whitelists: Whitelists;
+	assets: string[];
+	reserveTargets: string[];
+}> {
+	const MockUSDCFactory = await ethers.getContractFactory("MockUSDC");
+	const mockUSDC = await MockUSDCFactory.deploy() as MockUSDC;
+	const [whitelistsAdmin] = await ethers.getSigners();
+	const WhitelistsFactory = await ethers.getContractFactory("Whitelists");
+	const whitelists = await WhitelistsFactory.connect(whitelistsAdmin).deploy() as Whitelists;
+	const assets = [await mockUSDC.getAddress()];
+	const reserveTargets = [ethers.Wallet.createRandom().address];
+	await whitelists.connect(whitelistsAdmin).add(assets, reserveTargets, []);
+	return {mockUSDC, whitelists, assets, reserveTargets};
+}
+
+export async function deployFundFixture(): Promise<{
+	fund: Fund;
+	fundAdmin: SignerWithAddress;
+	assets: string[];
+	reserveTargets: string[];
+	mockUSDC: MockUSDC;
+	whitelists: Whitelists;
+}> {
+	const {mockUSDC, whitelists, assets, reserveTargets} = await loadFixture(setUpFundDeploymentFixture);
+	const [fundAdmin] = await ethers.getSigners();
+	const FundFactory = await ethers.getContractFactory("Fund");
+	const fund = await FundFactory.connect(fundAdmin).deploy(FundType.Reserve, whitelists.getAddress()) as Fund;
+	return {fund, fundAdmin, assets, reserveTargets, mockUSDC, whitelists};
 }
