@@ -7,6 +7,7 @@ import { deployFund } from "./deployFund";
 import { deployCoverageProof } from "./deployCoverageProof";
 import { deployTimelockController } from "./deployTimelockController";
 import { deployBeesCoverGovernor } from "./deployBeesCoverGovernor";
+import { deployArbitrator } from "./deployArbitrator";
 
 async function main() {
 	console.log("=== Deploying BeesCover Protocole ===");
@@ -24,6 +25,7 @@ async function main() {
 	const coverageProofAddress = await deployCoverageProof(admin.address);
 	const timelockControllerAddress = await deployTimelockController(minDelay, proposers, executors, admin.address);
 	const beesCoverGovernorAddress = await deployBeesCoverGovernor(beesCoverTokenAddress, timelockControllerAddress);
+	const arbitratorAddress = await deployArbitrator();
 
 	console.log("Deployment summary:");
 	console.log(`MockUSDC:\t${mockUSDCAddress}`);
@@ -34,6 +36,7 @@ async function main() {
 	console.log(`CoverageProof:\t${coverageProofAddress}`);
 	console.log(`TimelockController:\t${timelockControllerAddress}`);
 	console.log(`BeesCoverGovernor:\t${beesCoverGovernorAddress}`);
+	console.log(`Arbitrator:\t${arbitratorAddress}`);
 }
 
 main().catch((error) => {

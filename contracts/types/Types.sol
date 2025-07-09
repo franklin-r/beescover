@@ -2,6 +2,8 @@
 
 pragma solidity 0.8.28;
 
+import {IArbitrable} from "../interfaces/IArbitrable.sol";
+
 /// @title Types
 /// @notice Contains shared enum types used across the protocol
 library Types {
@@ -52,5 +54,33 @@ library Types {
 		uint256 poolId;
 		CoverageStatus status;
 		address insured;
+	}
+
+	/// @notice Enum representing the possible statuses of a dispute.
+	enum DisputeStatus {
+		/// The dispute is waiting for ruling.
+		Waiting,
+		/// The dispute is appealable.
+		Appealable,
+		/// The dispute is solved.
+		Solved
+	}
+
+	/// @notice Struct representing metadata of a specific dispute.
+	/// @param arbitrated The contract asking for arbitration.
+	/// @param choices The number of choices possible for the ruling.
+	/// @param ruling The current ruling for the dispute.
+	/// @param status The current status of the dispute.
+	/// @param appealPeriodStart Timestamp of the beginning of the appeal period.
+	/// @param appealPeriodStart Timestamp of the end of the appeal period.
+	/// @param appealCount Number of appeal already made for this dispute.
+	struct Dispute {
+		IArbitrable arbitrated;
+		uint256 choices;
+		uint256 ruling;
+		DisputeStatus status;
+		uint256 appealPeriodStart;
+		uint256 appealPeriodEnd;
+		uint256 appealCount;
 	}
 }
