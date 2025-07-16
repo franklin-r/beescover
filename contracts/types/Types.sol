@@ -83,4 +83,41 @@ library Types {
 		uint256 appealPeriodEnd;
 		uint256 appealCount;
 	}
+
+	/// @notice Struct representing metadata of a specific claim.
+	/// @param claimant Address of the claimant.
+	/// @param tokenId ID of the corresponding coverage proof.
+	/// @param disputeId ID of the corresponding dispute.
+	/// @param poolId The pool ID the claim refers to.
+	/// @param value Value claimed for payout.
+	/// @param ruling Current ruling of the claim.
+	/// @param evidenceURI URI of the evidence.
+	/// @param asset Asset for the pay-out.
+	/// @param ruled Whether the claim had been ruled or not.
+	struct Claim {
+		address claimant;
+		uint256 tokenId;
+		uint256 disputeId;
+		uint256 poolId;
+		uint256 value;
+		uint256 ruling;
+		string evidenceURI;
+		address asset;
+		bool ruled;
+	}
+
+	/// @notice Enum representing the type of coverage
+	enum CoverType {
+		/// Coverage agains token depeg
+		Depeg,
+		/// Coverage against protocole failure
+		Protocole,
+		/// Coverage against ETH slashing
+		Slashing
+	}
+
+	struct WithdrawalRequest {
+		uint256 amount;
+		uint256 unlockTimestamp;
+	}
 }
