@@ -6,7 +6,8 @@ import { deployFund } from "./deployFund";
 import { FundType } from "../test/utils/enums";
 import { deployCoverageProof } from "./deployCoverageProof";
 import { deployArbitrator } from "./deployArbitrator";
-import { Asset, poolConfigs } from "./helpers";
+import { Asset, poolConfigs } from "./utils/helpers";
+import { deploymentAddresses } from "./utils/addresses";
 
 export async function deployInsurancePool(
 	_admin: string,
@@ -73,10 +74,10 @@ export async function deployInsurancePool(
 if (require.main === module) {
 	(async () => {
 		// Update with the correct admin
-		const [deployer] = await ethers.getSigners();
+		const deployer = await ethers.getImpersonatedSigner("0x5941fd401ec7580c77ac31E45c9f59436a2f8C1b");
 
 		// Update with the correct asset
-		const poolConfig = poolConfigs.get(Asset.USDC);
+		const poolConfig = poolConfigs.get(Asset.EURS);
 
 		if (!poolConfig) {
 			throw new Error("Error. Asset unsuported.");
@@ -92,12 +93,16 @@ if (require.main === module) {
 			const arbitrator = await deployArbitrator();
 			*/
 			// Update after deployment
-			const whitelists = "0x15fb3eF714347B0d352d0e3BAAb1b53b99a587F5";
-			const treasuryFund = "0xab696EB9808226B7f18cB9d6957Dd7569d52df6F";
-			const reserveFund = "0xe43c3182a0025926202EdA46AA879A0EF2C1F6b1";
-			const beesCoverToken = "0xFff7b5E69107FdE7195676CD057ca6c15ba2A5f0";
-			const coverageProof = "0x7815C6Db8e243e90e8E80F05a5B197eAC3ec5eDB";
-			const arbitrator = "0x9555a5423b4004d8ced8b9751484d9975a86aee3";
+			const whitelists = deploymentAddresses.get("whitelists");
+			const treasuryFund = deploymentAddresses.get("treasuryFund");
+			const reserveFund = deploymentAddresses.get("reserveFund");
+			const beesCoverToken = deploymentAddresses.get("beesCoverToken");
+			const coverageProof = deploymentAddresses.get("coverageProof");
+			const arbitrator = deploymentAddresses.get("arbitrator");
+
+			if (!whitelists || !treasuryFund || !reserveFund || !beesCoverToken || !coverageProof || !arbitrator) {
+				throw new Error("Error. Couldn't fetch deployment addresses.");
+			}
 
 			const insurancePool = await deployInsurancePool(
 				deployer.address,

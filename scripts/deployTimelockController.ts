@@ -1,11 +1,14 @@
 import { ethers, network } from "hardhat";
 import { verify } from "../utils/verify";
 
-export async function deployTimelockController(minDelay: bigint, proposers: string[], executors: string[], admin: string): Promise<string> {
+export async function deployTimelockController(minDelay: bigint, proposers: string[], executors: string[], _admin: string): Promise<string> {
+
+	const admin = await ethers.getImpersonatedSigner(_admin);
 
 	// Deploy contract
 	console.log("Deploying TimelockController...");
-	const timelockController = await ethers.deployContract("TimelockController", [minDelay, proposers, executors, admin]);
+	const TimelockControllerFactory = await ethers.getContractFactory("TimelockController");
+	const timelockController = await TimelockControllerFactory.connect(admin).deploy(minDelay, proposers, executors, admin.address);
 	await timelockController.waitForDeployment();
 
 	// Detection of environment (local or other)

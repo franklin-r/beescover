@@ -3,11 +3,14 @@ import { verify } from "../utils/verify";
 import { deployBeesCoverToken } from "./deployBeesCoverToken";
 import { deployTimelockController } from "./deployTimelockController";
 
-export async function deployBeesCoverGovernor(tokenAddr: string, timelockControllerAddr: string): Promise<string> {
+export async function deployBeesCoverGovernor(_admin: string, tokenAddr: string, timelockControllerAddr: string): Promise<string> {
+
+	const admin = await ethers.getImpersonatedSigner(_admin);
 
 	// Deploy contract
 	console.log("Deploying BeesCoverGovernor...");
-	const beesCoverGovernor = await ethers.deployContract("BeesCoverGovernor", [tokenAddr, timelockControllerAddr]);
+	const BeesCoverGovernorFactory = await ethers.getContractFactory("BeesCoverGovernor");
+	const beesCoverGovernor = await BeesCoverGovernorFactory.connect(admin).deploy(tokenAddr, timelockControllerAddr);
 	await beesCoverGovernor.waitForDeployment();
 
 	// Detection of environment (local or other)
@@ -40,7 +43,7 @@ if (require.main === module) {
     try {
       const tokenAddr = await deployBeesCoverToken(deployer.address, recipient.address);
       const timelockControllerAddr = await deployTimelockController(minDelay, proposers, executors, deployer.address);
-      const governorAddr = await deployBeesCoverGovernor(tokenAddr, timelockControllerAddr);
+      const governorAddr = await deployBeesCoverGovernor(deployer.address, tokenAddr, timelockControllerAddr);
       console.log("Deployed at: ", governorAddr);
     } catch (err) {
       console.error("Deployment failed: ", err);
