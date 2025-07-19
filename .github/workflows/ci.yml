@@ -20,8 +20,8 @@ jobs:
       - name: Setup Node.js 22.17.0
         uses: actions/setup-node@v3
         with:
-          node-version: 22.17.0
-
+          node-version: '22.17.0'
+			
       - name: Cache Node Modules
         id: cache-node-modules
         uses: actions/cache@v2
