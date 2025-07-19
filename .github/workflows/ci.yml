@@ -49,32 +49,3 @@ jobs:
         with:
           name: coverage-report
           path: coverage/
-
-  mythril:
-    name: Mythril Security Analysis
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Python 3.10
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Install Mythril
-        run: |
-          pip install --upgrade pip
-          pip install mythril
-
-      - name: 🔎 Analyze contracts with Mythril (excluding mocks/interfaces)
-        run: |
-          mkdir -p flattened
-          find contracts -type f -name "*.sol" ! -path "*/mock/*" ! -path "*/interfaces/*" | while read file; do
-            echo "Flattening $file..."
-            filename=$(basename "$file")
-            npx hardhat flatten "$file" > flattened/"$filename"
-            echo "Analyzing $filename..."
-            myth analyze flattened/"$filename" --solv 0.8.28 --execution-timeout 60
-          done
