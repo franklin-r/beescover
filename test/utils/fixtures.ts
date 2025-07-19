@@ -20,6 +20,7 @@ import {
 	IAavePoolConfigurator,
 	IAaveACLManager
 } from "../../typechain-types";
+import { poolAsset } from "./testConfig";
 
 // ============================ BEES_COVER_TOKEN ============================ //
 
@@ -210,7 +211,7 @@ export async function deployInsurancePoolFixture(): Promise<{
 	coverageProof: CoverageProof;
 	arbitrator: Arbitrator;
 }> {
-	let assetSwitch: Asset = Asset.USDC;
+	let assetSwitch: Asset = poolAsset;
 	const {assetAddr, assetDecimals, admin} = await initAsset(assetSwitch);
 
 	const asset = (await ethers.getContractAt("@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20", assetAddr)) as unknown as IERC20;
