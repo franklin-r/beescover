@@ -1,0 +1,51 @@
+# .github/workflows/ci.yml
+
+name: BeesCover CI
+
+on:
+  push:
+    branches: [master, dev]
+  pull_request:
+    branches: [master, dev]
+
+jobs:
+  build-and-test:
+    name: Smart Contract Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22.17.0
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.17.0'
+			
+      - name: Cache Node Modules
+        id: cache-node-modules
+        uses: actions/cache@v2
+        with:
+          path: 'node_modules'
+          key: node_modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Compile contracts
+        run: npx hardhat compile
+
+      - name: Run tests
+        run: npx hardhat test
+
+      - name: Run coverage
+        if: always()
+        run: npx hardhat coverage
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage/
