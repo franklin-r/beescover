@@ -39,7 +39,7 @@ export async function deployBeesCoverToken(_admin: string, recipient: string): P
 	if (!isLocalhost && hasEtherscanKey) {
 		console.log("Contract verification in block explorer...");
 		// Call verification function with contract address and args
-		await verify(beesCoverToken.target.toString());
+		await verify(beesCoverToken.target.toString(), [recipient]);
 	}
 
 	return beesCoverToken.target.toString();

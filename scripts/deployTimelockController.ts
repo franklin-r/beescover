@@ -40,7 +40,14 @@ export async function deployTimelockController(minDelay: bigint, proposers: stri
 	if (!isLocalhost && hasEtherscanKey) {
 		console.log("Contract verification in block explorer...");
 		// Call verification function with contract address and args
-		await verify(timelockController.target.toString());
+		await verify(timelockController.target.toString(),
+			[
+				minDelay,
+				proposers,
+				executors,
+				_admin
+			]
+		);
 	}
 
 	return timelockController.target.toString();

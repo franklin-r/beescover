@@ -40,7 +40,7 @@ export async function deployFund(_admin: string, fundType: FundType, whitelists:
   if (!isLocalhost && hasEtherscanKey) {
     console.log("Contract verification in block explorer...");
 		// Call verification function with contract address and args
-    await verify(fund.target.toString());
+    await verify(fund.target.toString(), [FundType.Reserve, whitelists]);
   }
 
 	return fund.target.toString();

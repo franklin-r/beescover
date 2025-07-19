@@ -88,7 +88,20 @@ export async function deployInsurancePool(
 	if (!isLocalhost && hasEtherscanKey) {
 		console.log("Contract verification in block explorer...");
 		// Call verification function with contract address and args
-		await verify(insurancePool.target.toString());
+		await verify(insurancePool.target.toString(),
+			[
+				whitelists,
+				treasuryFund,
+				reserveFund,
+				beesCoverToken,
+				coverageProof,
+				arbitrator,
+				asset,
+				poolId,
+				risk,
+				metaEvidence
+			]
+		);
 		await verify(lpToken);
 	}
 

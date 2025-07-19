@@ -42,7 +42,7 @@ export async function deployBeesCoverGovernor(_admin: string, tokenAddr: string,
 	if (!isLocalhost && hasEtherscanKey) {
 		console.log("Contract verification in block explorer...");
 		// Call verification function with contract address and args
-		await verify(beesCoverGovernor.target.toString());
+		await verify(beesCoverGovernor.target.toString(), [tokenAddr, timelockControllerAddr]);
 	}
 
 	return beesCoverGovernor.target.toString();
