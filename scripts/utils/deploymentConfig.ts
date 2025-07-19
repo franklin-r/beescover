@@ -7,7 +7,7 @@ export enum Network {
 
 // Chnage config here
 export const deploymentAsset = Asset.USDC;
-export const deploymentNetwork = Network.FORK;
+export const deploymentNetwork = Network.SEPOLIA;
 
 export type DeploymentConfig = {
 	network: Network;
