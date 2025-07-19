@@ -17,3 +17,14 @@ export const verify = async(contractAddress: string, args?: any[]): Promise<void
 		}
 	}
 }
+
+if (require.main === module) {
+	(async () => {
+		await verify("0x712b3EDc5230D7bBBBAA89F1abEbA85b93b956a2",
+			[
+				"BeesCover_poolId_0_Depeg_LPToken",
+				"poolId_0_Depeg_LPT"
+			]
+		);
+	})();
+}
