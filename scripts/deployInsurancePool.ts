@@ -8,6 +8,13 @@ import { deployCoverageProof } from "./deployCoverageProof";
 import { deployArbitrator } from "./deployArbitrator";
 import { Asset, poolConfigs } from "./utils/helpers";
 import { deploymentAddresses } from "./utils/addresses";
+import {
+	adminAddresses,
+	deploymentConfig,
+	Network,
+	getDeploymentKey,
+	deploymentAsset
+} from "./utils/deploymentConfig";
 
 export async function deployInsurancePool(
 	_admin: string,
@@ -26,12 +33,15 @@ export async function deployInsurancePool(
 	lpToken: string
 }> {
 
-	const admin = await ethers.getImpersonatedSigner(_admin);
-
 	// Deploy contract
 	console.log("=== Deploying BeesCover Protocol's Insurance Pool Contract ===");
 	const InsurancePoolFactory = await ethers.getContractFactory("InsurancePool");
-	const insurancePool = await InsurancePoolFactory.connect(admin).deploy(
+
+	let admin;
+	let insurancePool;
+	if (deploymentConfig.network == Network.FORK) {
+		admin = await ethers.getImpersonatedSigner(_admin);
+		insurancePool = await InsurancePoolFactory.connect(admin).deploy(
 		whitelists,
 		treasuryFund,
 		reserveFund,
@@ -43,6 +53,22 @@ export async function deployInsurancePool(
 		risk,
 		metaEvidence
 	);
+	}
+	else {
+		insurancePool = await InsurancePoolFactory.deploy(
+		whitelists,
+		treasuryFund,
+		reserveFund,
+		beesCoverToken,
+		coverageProof,
+		arbitrator,
+		asset,
+		poolId,
+		risk,
+		metaEvidence
+	);
+	}
+
 	await insurancePool.waitForDeployment();
 
 	// Detection of environment (local or other)
@@ -74,10 +100,14 @@ export async function deployInsurancePool(
 if (require.main === module) {
 	(async () => {
 		// Update with the correct admin
-		const deployer = await ethers.getImpersonatedSigner("0x5941fd401ec7580c77ac31E45c9f59436a2f8C1b");
+		const admin = adminAddresses.get(getDeploymentKey(deploymentConfig));
+
+		if (!admin) {
+			throw new Error("Error. Couldn't retrieve admin address for this deployment config.");
+		}
 
 		// Update with the correct asset
-		const poolConfig = poolConfigs.get(Asset.EURS);
+		const poolConfig = poolConfigs.get(deploymentAsset);
 
 		if (!poolConfig) {
 			throw new Error("Error. Asset unsuported.");
@@ -85,11 +115,11 @@ if (require.main === module) {
 
 		try {
 			/*
-			const whitelists = await deployWhitelists(deployer.address);
-			const treasuryFund = await deployFund(deployer.address, FundType.Treasury, whitelists);
-			const reserveFund = await deployFund(deployer.address, FundType.Reserve, whitelists);
-			const beesCoverToken = await deployBeesCoverToken(deployer.address, treasuryFund);
-			const coverageProof = await deployCoverageProof(deployer.address);
+			const whitelists = await deployWhitelists(admin);
+			const treasuryFund = await deployFund(admin, FundType.Treasury, whitelists);
+			const reserveFund = await deployFund(admin, FundType.Reserve, whitelists);
+			const beesCoverToken = await deployBeesCoverToken(admin, treasuryFund);
+			const coverageProof = await deployCoverageProof(admin);
 			const arbitrator = await deployArbitrator();
 			*/
 			// Update after deployment
@@ -105,7 +135,7 @@ if (require.main === module) {
 			}
 
 			const insurancePool = await deployInsurancePool(
-				deployer.address,
+				admin,
 				whitelists,
 				treasuryFund,
 				reserveFund,

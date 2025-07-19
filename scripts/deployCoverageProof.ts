@@ -1,14 +1,28 @@
 import { ethers, network } from "hardhat";
 import { verify } from "../utils/verify";
+import {
+	adminAddresses,
+	deploymentConfig,
+	Network,
+	getDeploymentKey
+} from "./utils/deploymentConfig";
 
-export async function deployCoverageProof(admin: string): Promise<string> {
-
-	const _admin = await ethers.getImpersonatedSigner(admin);
+export async function deployCoverageProof(_admin: string): Promise<string> {
 
 	// Deploy contract
 	console.log("Deploying CoverageProof...");
 	const CoverageProofFactory = await ethers.getContractFactory("CoverageProof");
-	const coverageProof = await CoverageProofFactory.connect(_admin).deploy();
+
+	let admin;
+	let coverageProof;
+	if (deploymentConfig.network == Network.FORK) {
+		admin = await ethers.getImpersonatedSigner(_admin);
+		coverageProof = await CoverageProofFactory.connect(admin).deploy();
+	}
+	else {
+		coverageProof = await CoverageProofFactory.deploy();
+	}
+
 	await coverageProof.waitForDeployment();
 
 	// Detection of environment (local or other)
@@ -33,10 +47,14 @@ export async function deployCoverageProof(admin: string): Promise<string> {
 
 if (require.main === module) {
 	(async () => {
-		const [admin] = await ethers.getSigners();
+		const admin = adminAddresses.get(getDeploymentKey(deploymentConfig));
+
+		if (!admin) {
+			throw new Error("Error. Couldn't retrieve admin address for this deployment config.");
+		}
 
 		try {
-			const coverageProofAddr = await deployCoverageProof(admin.address);
+			const coverageProofAddr = await deployCoverageProof(admin);
 			console.log("Deployed at: ", coverageProofAddr);
 		} catch (err) {
 			console.error("Deployment failed: ", err);

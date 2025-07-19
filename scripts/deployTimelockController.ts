@@ -1,14 +1,29 @@
 import { ethers, network } from "hardhat";
 import { verify } from "../utils/verify";
+import {
+	adminAddresses,
+	deploymentConfig,
+	Network,
+	getDeploymentKey
+} from "./utils/deploymentConfig";
 
 export async function deployTimelockController(minDelay: bigint, proposers: string[], executors: string[], _admin: string): Promise<string> {
-
-	const admin = await ethers.getImpersonatedSigner(_admin);
 
 	// Deploy contract
 	console.log("Deploying TimelockController...");
 	const TimelockControllerFactory = await ethers.getContractFactory("TimelockController");
-	const timelockController = await TimelockControllerFactory.connect(admin).deploy(minDelay, proposers, executors, admin.address);
+
+	let admin;
+	let timelockController;
+	if (deploymentConfig.network == Network.FORK) {
+		admin = await ethers.getImpersonatedSigner(_admin);
+		timelockController = await TimelockControllerFactory.connect(admin).deploy(minDelay, proposers, executors, admin.address);
+	}
+	else {
+		admin = _admin
+		timelockController = await TimelockControllerFactory.deploy(minDelay, proposers, executors, admin);
+	}
+
 	await timelockController.waitForDeployment();
 
 	// Detection of environment (local or other)
@@ -33,13 +48,18 @@ export async function deployTimelockController(minDelay: bigint, proposers: stri
 
 if (require.main === module) {
   (async () => {
-    const [admin] = await ethers.getSigners();
+    const admin = adminAddresses.get(getDeploymentKey(deploymentConfig));
+
+		if (!admin) {
+			throw new Error("Error. Couldn't retrieve admin address for this deployment config.");
+		}
+
     const minDelay = BigInt(60 * 60 * 24 * 7);	// 1 week
     const proposers: string[] = [];
     const executors: string[] = ["0x0000000000000000000000000000000000000000"];
 
     try {
-      const timelockControllerAddr = await deployTimelockController(minDelay, proposers, executors, admin.address);
+      const timelockControllerAddr = await deployTimelockController(minDelay, proposers, executors, admin);
       console.log("Deployed at: ", timelockControllerAddr);
     } catch (err) {
       console.error("Deployment failed: ", err);

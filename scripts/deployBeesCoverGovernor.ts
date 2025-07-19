@@ -2,15 +2,30 @@ import { ethers, network } from "hardhat";
 import { verify } from "../utils/verify";
 import { deployBeesCoverToken } from "./deployBeesCoverToken";
 import { deployTimelockController } from "./deployTimelockController";
+import {
+	adminAddresses,
+	deploymentConfig,
+	Network,
+	getDeploymentKey
+} from "./utils/deploymentConfig";
 
 export async function deployBeesCoverGovernor(_admin: string, tokenAddr: string, timelockControllerAddr: string): Promise<string> {
-
-	const admin = await ethers.getImpersonatedSigner(_admin);
 
 	// Deploy contract
 	console.log("Deploying BeesCoverGovernor...");
 	const BeesCoverGovernorFactory = await ethers.getContractFactory("BeesCoverGovernor");
-	const beesCoverGovernor = await BeesCoverGovernorFactory.connect(admin).deploy(tokenAddr, timelockControllerAddr);
+
+	let admin;
+	let beesCoverGovernor;
+	if (deploymentConfig.network == Network.FORK) {
+		admin = await ethers.getImpersonatedSigner(_admin);
+		beesCoverGovernor = await BeesCoverGovernorFactory.connect(admin).deploy(tokenAddr, timelockControllerAddr);
+	}
+	else {
+		admin = _admin;
+		beesCoverGovernor = await BeesCoverGovernorFactory.deploy(tokenAddr, timelockControllerAddr);
+	}
+
 	await beesCoverGovernor.waitForDeployment();
 
 	// Detection of environment (local or other)
@@ -35,15 +50,21 @@ export async function deployBeesCoverGovernor(_admin: string, tokenAddr: string,
 
 if (require.main === module) {
   (async () => {
-    const [deployer, recipient] = await ethers.getSigners();
+		const admin = adminAddresses.get(getDeploymentKey(deploymentConfig));
+		const recipient = admin;
+
+		if (!admin || !recipient) {
+			throw new Error("Error. Couldn't retrieve admin address for this deployment config.");
+		}
+
     const minDelay = BigInt(60 * 60 * 24 * 7);	// 1 week
     const proposers: string[] = [];
     const executors: string[] = ["0x0000000000000000000000000000000000000000"];
 
     try {
-      const tokenAddr = await deployBeesCoverToken(deployer.address, recipient.address);
-      const timelockControllerAddr = await deployTimelockController(minDelay, proposers, executors, deployer.address);
-      const governorAddr = await deployBeesCoverGovernor(deployer.address, tokenAddr, timelockControllerAddr);
+      const tokenAddr = await deployBeesCoverToken(admin, recipient);
+      const timelockControllerAddr = await deployTimelockController(minDelay, proposers, executors, admin);
+      const governorAddr = await deployBeesCoverGovernor(admin, tokenAddr, timelockControllerAddr);
       console.log("Deployed at: ", governorAddr);
     } catch (err) {
       console.error("Deployment failed: ", err);

@@ -1,15 +1,29 @@
 import { ethers, network } from "hardhat";
 import { verify } from "../utils/verify";
 import { FundType } from "../test/utils/enums";
+import {
+	adminAddresses,
+	deploymentConfig,
+	Network,
+	getDeploymentKey
+} from "./utils/deploymentConfig";
 
-export async function deployFund(admin: string, fundType: FundType, whitelists: string): Promise<string> {
-
-	const _admin = await ethers.getImpersonatedSigner(admin);
+export async function deployFund(_admin: string, fundType: FundType, whitelists: string): Promise<string> {
 
   // Deploy contract
 	console.log(`Deploying Fund: ${FundType[fundType]} ...`);
 	const FundFactory = await ethers.getContractFactory("Fund");
-	const fund = await FundFactory.connect(_admin).deploy(FundType.Reserve, whitelists);
+
+	let admin;
+	let fund;
+	if (deploymentConfig.network == Network.FORK) {
+		admin = await ethers.getImpersonatedSigner(_admin);
+		fund = await FundFactory.connect(admin).deploy(FundType.Reserve, whitelists);
+	}
+	else {
+		fund = await FundFactory.deploy(FundType.Reserve, whitelists);
+	}
+
   await fund.waitForDeployment();
 
 	// Detection of environment (local or other)
@@ -35,10 +49,15 @@ export async function deployFund(admin: string, fundType: FundType, whitelists: 
 if (require.main === module) {
 	(async () => {
 		const fundType = FundType.Treasury;
-		const [admin, whitelists] = await ethers.getSigners();
+		const [whitelists] = await ethers.getSigners();
+		const admin = adminAddresses.get(getDeploymentKey(deploymentConfig));
+
+		if (!admin) {
+			throw new Error("Error. Couldn't retrieve admin address for this deployment config.");
+		}
 
 		try {
-			const fundAddr = await deployFund(admin.address, fundType, whitelists.address);
+			const fundAddr = await deployFund(admin, fundType, whitelists.address);
 			console.log("Deployed at: ", fundAddr);
 		} catch (err) {
 			console.error("Deployment failed: ", err);

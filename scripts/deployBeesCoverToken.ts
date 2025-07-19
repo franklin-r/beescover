@@ -1,14 +1,28 @@
 import { ethers, network } from "hardhat";
 import { verify } from "../utils/verify";
+import {
+	adminAddresses,
+	deploymentConfig,
+	Network,
+	getDeploymentKey
+} from "./utils/deploymentConfig";
 
-export async function deployBeesCoverToken(deployer: string, recipient: string): Promise<string> {
-
-	const _deployer = await ethers.getImpersonatedSigner(deployer);
+export async function deployBeesCoverToken(_admin: string, recipient: string): Promise<string> {
 
 	// Deploy contract
 	console.log("Deploying BeesCoverToken...");
-	const BeesCoverTokenFactory = await ethers.getContractFactory("BeesCoverToken", _deployer);
-	const beesCoverToken = await BeesCoverTokenFactory.connect(_deployer).deploy(recipient);
+	const BeesCoverTokenFactory = await ethers.getContractFactory("BeesCoverToken");
+
+	let admin;
+	let beesCoverToken;
+	if (deploymentConfig.network == Network.FORK) {
+		admin = await ethers.getImpersonatedSigner(_admin);
+		beesCoverToken = await BeesCoverTokenFactory.connect(admin).deploy(recipient);
+	}
+	else {
+		beesCoverToken = await BeesCoverTokenFactory.deploy(recipient);
+	}
+
 	await beesCoverToken.waitForDeployment();
 
 	// Detection of environment (local or other)
@@ -33,10 +47,15 @@ export async function deployBeesCoverToken(deployer: string, recipient: string):
 
 if (require.main === module) {
   (async () => {
-    const [deployer, recipient] = await ethers.getSigners();
+    const admin = adminAddresses.get(getDeploymentKey(deploymentConfig));
+		const recipient = admin;
+
+		if (!admin || !recipient) {
+			throw new Error("Error. Couldn't retrieve admin address for this deployment config.");
+		}
 
     try {
-      const beesCoverTokenAddr = await deployBeesCoverToken(deployer.address, recipient.address);
+      const beesCoverTokenAddr = await deployBeesCoverToken(admin, recipient);
       console.log("Deployed at: ", beesCoverTokenAddr);
     } catch (err) {
       console.error("Deployment failed: ", err);

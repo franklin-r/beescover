@@ -1,14 +1,28 @@
 import { ethers, network } from "hardhat";
 import { verify } from "../utils/verify";
+import {
+	adminAddresses,
+	deploymentConfig,
+	Network,
+	getDeploymentKey
+} from "./utils/deploymentConfig";
 
-export async function deployWhitelists(admin: string): Promise<string> {
-
-	const _admin = await ethers.getImpersonatedSigner(admin);
+export async function deployWhitelists(_admin: string): Promise<string> {
 
 	// Deploy contract
 	console.log("Deploying Whitelists...");
 	const WhitelistsFactory = await ethers.getContractFactory("Whitelists");
-	const whitelists = await WhitelistsFactory.connect(_admin).deploy();
+
+	let admin;
+	let whitelists;
+	if (deploymentConfig.network == Network.FORK) {
+		admin = await ethers.getImpersonatedSigner(_admin);
+		whitelists = await WhitelistsFactory.connect(admin).deploy();
+	}
+	else {
+		whitelists = await WhitelistsFactory.deploy();
+	}
+
 	await whitelists.waitForDeployment();
 
 	// Detection of environment (local or other)
@@ -33,10 +47,14 @@ export async function deployWhitelists(admin: string): Promise<string> {
 
 if (require.main === module) {
 	(async () => {
-		const [admin] = await ethers.getSigners();
+		const admin = adminAddresses.get(getDeploymentKey(deploymentConfig));
+
+		if (!admin) {
+			throw new Error("Error. Couldn't retrieve admin address for this deployment config.");
+		}
 
 		try {
-			const whitelistsAddr = await deployWhitelists(admin.address);
+			const whitelistsAddr = await deployWhitelists(admin);
 			console.log("Deployed at: ", whitelistsAddr);
 		} catch (err) {
 			console.error("Deployment failed: ", err);

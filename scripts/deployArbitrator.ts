@@ -5,7 +5,8 @@ export async function deployArbitrator(): Promise<string> {
 
 	// Deploy contract
 	console.log("Deploying Arbitrator...");
-	const arbitrator = await ethers.deployContract("Arbitrator");
+	const ArbitratorFactory = await ethers.getContractFactory("Arbitrator");
+	const arbitrator = await ArbitratorFactory.deploy();
 	await arbitrator.waitForDeployment();
 
 	// Detection of environment (local or other)
