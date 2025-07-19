@@ -1,11 +1,12 @@
 export const deploymentAddresses = new Map<string, string>();
 
-deploymentAddresses.set("whitelists", "0x8b0f6b645FF1f3b19f57e2B7c85E468875eE39b5");
-deploymentAddresses.set("reserveFund", "0x25d78808831CEC17cb87a4a2D86FE38868cc88fc");
-deploymentAddresses.set("treasuryFund", "0x76F2B9CB307b233C5F80e7aCF5510251A40e4DC4");
-deploymentAddresses.set("beesCoverToken", "0x641DFd4DC240eBBD8249b823D4554b5745f03158");
-deploymentAddresses.set("coverageProof", "0x5ffcbEA95B1E88DB736Fe29b9D0030950709EE25");
-deploymentAddresses.set("timelockController", "0xbdD4012A6dfCC5C8652eFFfd9b20131f89c515F5");
-deploymentAddresses.set("beesCoverGovernor", "0x963C3F5087A24CB2E22F0cB77F226C0e08c5D1ab");
-deploymentAddresses.set("arbitrator", "0x9555a5423b4004d8ced8b9751484d9975a86aee3");
-deploymentAddresses.set("insurancePool", "0x96d62dc3fb5a8819ec893b63af12c609042919a5");
+deploymentAddresses.set("whitelists", "0xC3E9a85B11C6Ad13cdeCe942971e9B015560C393");					// SEPOLIA
+deploymentAddresses.set("reserveFund", "0x65B150b9Bd22559B4F3cb7567d9932887D3Eb04a");					// SEPOLIA
+deploymentAddresses.set("treasuryFund", "0xC44AD89C0e9Cc0B3A045BFDE9998A9e32BEe9638");				// SEPOLIA
+deploymentAddresses.set("beesCoverToken", "0x700f78D269220d9890036aD634C01b4F52BD2D39");			// SEPOLIA
+deploymentAddresses.set("coverageProof", "0x36c90dc3E8188d1437028c26ab2aB62eF0d2B62c");				// SEPOLIA
+deploymentAddresses.set("timelockController", "0x5a4c814a813caB74184892bE6cA10435F33B7A09");	// SEPOLIA
+deploymentAddresses.set("beesCoverGovernor", "0x1Cb2073bA8647bbDE1803B7B1B724D30BFbADC8b");		// SEPOLIA
+deploymentAddresses.set("arbitrator", "0x9555a5423b4004d8ced8b9751484d9975a86aee3");					// SEPOLIA
+deploymentAddresses.set("insurancePool", "0xbAa5EF807869dc71dB74a2528aCd2F9Ebc4DfE8E");				// SEPOLIA - USDC
+deploymentAddresses.set("LPToken", "0x712b3EDc5230D7bBBBAA89F1abEbA85b93b956a2");							// SEPOLIA - USDC
