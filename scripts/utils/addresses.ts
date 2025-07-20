@@ -8,5 +8,7 @@ deploymentAddresses.set("coverageProof", "0x36c90dc3E8188d1437028c26ab2aB62eF0d2
 deploymentAddresses.set("timelockController", "0x5a4c814a813caB74184892bE6cA10435F33B7A09");	// SEPOLIA
 deploymentAddresses.set("beesCoverGovernor", "0x1Cb2073bA8647bbDE1803B7B1B724D30BFbADC8b");		// SEPOLIA
 deploymentAddresses.set("arbitrator", "0x9555a5423b4004d8ced8b9751484d9975a86aee3");					// SEPOLIA
-deploymentAddresses.set("insurancePool", "0xa26f416eCDE74cC20cedc6E4b9641274beFc1421");				// SEPOLIA - USDC
-deploymentAddresses.set("LPToken", "0xc88E1ea695C224FBEfe57CE288183c4d48F5Bf9a");							// SEPOLIA - USDC
+// deploymentAddresses.set("insurancePool", "0xa26f416eCDE74cC20cedc6E4b9641274beFc1421");				// SEPOLIA - USDC
+// deploymentAddresses.set("LPToken", "0xc88E1ea695C224FBEfe57CE288183c4d48F5Bf9a");							// SEPOLIA - USDC
+deploymentAddresses.set("insurancePool", "0x1315401F9D24e1B4B8772EbB6937e7eaDaA6BE38");				// SEPOLIA - WBTC
+deploymentAddresses.set("LPToken", "0x3747a2d4BC52DF7eBAfCB707EC740db128709274");							// SEPOLIA - WBTC
