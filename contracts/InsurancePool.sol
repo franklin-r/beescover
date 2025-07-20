@@ -118,6 +118,10 @@ contract InsurancePool is IInsurancePool, IArbitrable, IEvidence, AccessControl 
 		emit GovernanceTokenAprUpdated(poolId, oldApr, _apr);
 	}
 
+	function getAavePoolAPR() external view returns (uint128) {
+		return aavePool.getReserveData(address(asset)).currentLiquidityRate;
+	}
+
 	function deposit(uint256 _amount) external {
     asset.transferFrom(msg.sender, address(this), _amount);
     asset.approve(address(aavePool), _amount);
