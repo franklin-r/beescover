@@ -47,15 +47,17 @@ interface IArbitrator {
 		* @dev Create a dispute. Must be called by the arbitrable contract.
 		* Must be paid at least arbitrationCost().
 		* @param _choices Amount of choices the arbitrator can make in this dispute.
+		* @param _extraData Can be used to give additional info on the dispute to be created.
 		* @return disputeID ID of the dispute created.
 		*/
-	function createDispute(uint256 _choices) external payable returns (uint256 disputeID);
+	function createDispute(uint256 _choices, bytes memory _extraData) external payable returns (uint256 disputeID);
 
 	/**
 		* @dev Compute the cost of arbitration. It is recommended not to increase it often, as it can be highly time and gas consuming for the arbitrated contracts to cope with fee augmentation.
+		* @param _extraData Can be used to give additional info on the dispute to be created.
 		* @return cost Amount to be paid.
 		*/
-	function arbitrationCost() external view returns (uint256 cost);
+	function arbitrationCost(bytes memory _extraData) external view returns (uint256 cost);
 
 	/**
 		* @dev Appeal a ruling. Note that it has to be called before the arbitrator contract calls rule.

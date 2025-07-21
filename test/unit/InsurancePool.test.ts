@@ -1077,7 +1077,7 @@ describe("InsurancePool Tests", () => {
 			const coverageInfo = await coverageProof.coverageInfos(tokenId);
 			const coverageValue = coverageInfo[0];
 
-			const arbitrationCost = await arbitrator.arbitrationCost();
+			const arbitrationCost = await arbitrator.arbitrationCost("0x");
 
 			await insurancePool.connect(insured).createClaim(tokenId, evidenceURI, {value: arbitrationCost});
 
@@ -1097,7 +1097,7 @@ describe("InsurancePool Tests", () => {
 			const tokenId = 0n;
 			const evidenceURI = "ipfs://link-to-evidence";
 
-			const arbitrationCost = await arbitrator.arbitrationCost();
+			const arbitrationCost = await arbitrator.arbitrationCost("0x");
 
 			await insurancePool.connect(insured).createClaim(tokenId, evidenceURI, {value: arbitrationCost});
 
@@ -1108,7 +1108,7 @@ describe("InsurancePool Tests", () => {
 			const tokenId = 0n;
 			const evidenceURI = "ipfs://link-to-evidence";
 
-			const arbitrationCost = await arbitrator.arbitrationCost();
+			const arbitrationCost = await arbitrator.arbitrationCost("0x");
 
 			await insurancePool.connect(insured).createClaim(tokenId, evidenceURI, {value: arbitrationCost});
 
@@ -1122,7 +1122,7 @@ describe("InsurancePool Tests", () => {
 			const tokenId = 0n;
 			const evidenceURI = "ipfs://link-to-evidence";
 
-			const arbitrationCost = await arbitrator.arbitrationCost();
+			const arbitrationCost = await arbitrator.arbitrationCost("0x");
 
 			await expect(insurancePool.connect(insured).createClaim(tokenId, evidenceURI, {value: arbitrationCost})).to
 			.emit(

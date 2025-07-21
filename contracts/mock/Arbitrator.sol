@@ -48,7 +48,7 @@ contract Arbitrator is IArbitrator {
 
 	Types.Dispute[] public disputes;
 
-	function arbitrationCost() public view override returns (uint256) {
+	function arbitrationCost(bytes memory _extraData) public view override returns (uint256) {
 		return arbitrationFee;
 	}
 
@@ -60,13 +60,13 @@ contract Arbitrator is IArbitrator {
 		arbitrationFee = _newCost;
 	}
 
-	function createDispute(uint256 _choices)
+	function createDispute(uint256 _choices, bytes memory _extraData)
 		public
 		payable
 		override
 		returns (uint256 disputeID)
 	{
-		uint256 requiredAmount = arbitrationCost();
+		uint256 requiredAmount = arbitrationCost(_extraData);
 		if (msg.value > requiredAmount) {
 			revert InsufficientPayment(msg.value, requiredAmount);
 		}

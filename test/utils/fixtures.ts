@@ -545,7 +545,7 @@ export async function createClaimFixture(): Promise <{
 
 	const tokenId = 0n;
 	const evidenceURI = "ipfs://link-to-evidence";
-	const arbitrationCost = await arbitrator.arbitrationCost();
+	const arbitrationCost = await arbitrator.arbitrationCost("0x");
 
 	await insurancePool.connect(insured).createClaim(tokenId, evidenceURI, {value: arbitrationCost});
 
@@ -651,7 +651,7 @@ export async function extremeCreateClaimFixture(): Promise <{
 
 	const tokenId = 0n;
 	const evidenceURI = "ipfs://link-to-evidence";
-	const arbitrationCost = await arbitrator.arbitrationCost();
+	const arbitrationCost = await arbitrator.arbitrationCost("");
 
 	await insurancePool.connect(insured).createClaim(tokenId, evidenceURI, {value: arbitrationCost});
 

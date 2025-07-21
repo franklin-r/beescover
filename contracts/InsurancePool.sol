@@ -273,7 +273,7 @@ contract InsurancePool is IInsurancePool, IArbitrable, IEvidence, AccessControl 
 		require(coverageInfo.status == Types.CoverageStatus.Active, InvalidStatus());
 
 		// 3 answer options: 0: Abstain / 1: Yes / 2: No
-		uint256 disputeId = arbitrator.createDispute{value: msg.value}(3);
+		uint256 disputeId = arbitrator.createDispute{value: msg.value}(3, "");
 		uint256 claimId = nextClaimId++;
 
 		claims[claimId] = Types.Claim({
