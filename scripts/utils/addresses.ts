@@ -10,5 +10,5 @@ deploymentAddresses.set("beesCoverGovernor", "0x1Cb2073bA8647bbDE1803B7B1B724D30
 deploymentAddresses.set("arbitrator", "0x9555a5423b4004d8ced8b9751484d9975a86aee3");					// SEPOLIA
 // deploymentAddresses.set("insurancePool", "0xa26f416eCDE74cC20cedc6E4b9641274beFc1421");				// SEPOLIA - USDC
 // deploymentAddresses.set("LPToken", "0xc88E1ea695C224FBEfe57CE288183c4d48F5Bf9a");							// SEPOLIA - USDC
-deploymentAddresses.set("insurancePool", "0x1315401F9D24e1B4B8772EbB6937e7eaDaA6BE38");				// SEPOLIA - WBTC
-deploymentAddresses.set("LPToken", "0x3747a2d4BC52DF7eBAfCB707EC740db128709274");							// SEPOLIA - WBTC
+deploymentAddresses.set("insurancePool", "0x7A9CDF178DB26637C4A4e41f1563e1e2c3B19ABd");				// SEPOLIA - WBTC
+deploymentAddresses.set("LPToken", "0xee443958010BA8845e35F62E3b9efBB6C82555ef");							// SEPOLIA - WBTC

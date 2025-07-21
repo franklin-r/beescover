@@ -64,7 +64,7 @@ export async function setUpInsurancePool(
 		await whitelistsContract.connect(admin).add(assets, reserveTargets, treasuryTargets);
 	}
 	else {
-		await whitelistsContract.add(assets, reserveTargets, treasuryTargets);
+		await whitelistsContract.add(assets, reserveTargets, []);
 	}
 
 	// Reserve Fund
