@@ -102,7 +102,7 @@ export async function deployInsurancePool(
 				metaEvidence
 			]
 		);
-		await verify(lpToken);
+		//await verify(lpToken);
 	}
 
 	const insurancePoolAddr = insurancePool.target.toString();
